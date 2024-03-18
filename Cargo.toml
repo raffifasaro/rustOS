@@ -9,8 +9,12 @@ edition = "2021"
 
 
 # set panic to abort to prevent stack unwinding and our language item "eh_personality" error
-[profile.dev]
-panic = "abort"
+#[profile.dev]
+#build-std = ["unstable"]
+#panic = "abort"
 
-[profile.release]
-panic = "abort"
+#[profile.release]
+#build-std = ["unstable"]
+#panic = "abort"
+
+#->moved to OStt json
