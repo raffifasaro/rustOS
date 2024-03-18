@@ -1,5 +1,7 @@
-
+//compiler attribute
 #![no_std]
+//no main because we don't want to use the normal entry point chain (Rust runtime, start from crt0...)
+#![no_main]
 
 //basically import of PanicInfo
 use core::panic::PanicInfo;
@@ -13,4 +15,14 @@ fn panic(_info: &PanicInfo) -> ! {
     loop {}
 }
 
-fn main() {}
+//overwrite of entry point
+//no mangle to stop Rust from name mangling and outputs _start
+#[no_mangle]
+// "C" to use C calling convention
+pub extern "C" fn _start() -> ! {
+    loop {}
+}
+// we need to build for a target triple with no underlying OS for now
+// to build use: cargo build --target thumbv7em-none-eabihf
+// (install target triple: rustup target add thumbv7em-none-eabihf)
+
