@@ -10,22 +10,36 @@ use core::panic::PanicInfo;
 #[panic_handler]
 //_ is convention because info parameter is not used
 //-> ! specifies return type of function. ! is the "never type" indicating returning NOTHING, not even control to the caller
-// (different to "void" equivalent of omitting the return type
+//(different to "void" equivalent of omitting the return type
 fn panic(_info: &PanicInfo) -> ! {
     loop {}
 }
 
 //overwrite of entry point
 //no mangle to stop Rust from name mangling and outputs _start
+
+
+static HELLO: &[u8] = b"Hello World!";
 #[no_mangle]
 // "C" to use C calling convention
 pub extern "C" fn _start() -> ! {
+    //casting the int of our mem address into a raw pointer
+    let vga_buffer = 0xb8000 as *mut u8;
+
+    //iterating over bytes of HELLO string
+    for (i, &byte) in HELLO.iter().enumerate() {
+        unsafe {
+            //writing string byte and color byte
+            *vga_buffer.offset(i as isize * 2) = byte;
+            *vga_buffer.offset(i as isize * 2 + 1) = 0xb;
+        }
+    }
     loop {}
 }
-// we need to build for a target triple with no underlying OS for now
-// --to build use: cargo build --target thumbv7em-none-eabihf--
-// --(install target triple: rustup target add thumbv7em-none-eabihf)--
+//we need to build for a target triple with no underlying OS for now
+//--to build use: cargo build --target thumbv7em-none-eabihf--
+//--(install target triple: rustup target add thumbv7em-none-eabihf)--
 
-// we need nighly mode: rustup override set nightly
+//we need nighly mode: rustup override set nightly
 
 //Self defined tt: cargo build --target x86_64-RustOStt.json
