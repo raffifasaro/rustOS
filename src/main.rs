@@ -21,7 +21,7 @@ fn panic(_info: &PanicInfo) -> ! {
 
 static HELLO: &[u8] = b"Hello World!";
 #[no_mangle]
-// "C" to use C calling convention
+//"C" to use C calling convention
 pub extern "C" fn _start() -> ! {
     //casting the int of our mem address into a raw pointer
     let vga_buffer = 0xb8000 as *mut u8;
