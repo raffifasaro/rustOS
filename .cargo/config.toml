@@ -5,3 +5,7 @@ build-std-features = ["compiler-builtins-mem"]
 
 [build]
 target = "x86_64-RustOStt.json"
+
+#use for running in QEMU:
+[target.'cfg(target_os = "none")']
+runner = "bootimage runner"
