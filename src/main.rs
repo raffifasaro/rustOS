@@ -36,10 +36,8 @@ pub extern "C" fn _start() -> ! {
     }
     loop {}
 }
-//we need to build for a target triple with no underlying OS for now
+//--we need to build for a target triple with no underlying OS for now--
 //--to build use: cargo build --target thumbv7em-none-eabihf--
 //--(install target triple: rustup target add thumbv7em-none-eabihf)--
 
 //we need nighly mode: rustup override set nightly
-
-//Self defined tt: cargo build --target x86_64-RustOStt.json
