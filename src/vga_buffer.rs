@@ -59,3 +59,71 @@ pub struct Writer {
     // reference to VGA buffer
     buffer: &'static mut Buffer,
 }
+
+impl Writer {
+    fn new_line(&mut self) {
+        // todo
+    }
+    pub fn write_byte(&mut self, byte: u8) {
+        match byte {
+            //if match is byte literal execute newline()
+            b'\n' => self.new_line(),
+            byte => {
+                // check if current line is full
+                if self.column_position >= BUFFER_WIDTH {
+                    self.new_line();
+                }
+
+                let row = BUFFER_HEIGHT -1;
+                let col = self.column_position;
+                let color_code = self.color_code;
+
+                // write new ScreenChar to current position
+                self.buffer.chars[row][col] = ScreenChar {
+                    ascii_character: byte,
+                    color_code,
+                };
+                // advance column position when done
+                self.column_position += 1;
+
+            }
+        }
+    }
+
+    pub fn write_string(&mut self, string: &str) {
+        for byte in string.bytes() {
+            match byte {
+                // if the byte is Ascii printable or newline, write
+                0x20..=0x7e | b'\n' => self.write_byte(byte),
+                // else print ■
+                _ => self.write_byte(0xfe),
+            }
+        }
+    }
+}
+
+
+// temp write function
+pub fn print_something() {
+    let mut writer = Writer {
+        column_position: 0,
+        color_code: ColorCode::new(Color::Cyan, Color::DarkGray),
+        buffer: unsafe { &mut *(0xb8000 as *mut Buffer)}
+    };
+
+    writer.write_string("Test");
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

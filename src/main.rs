@@ -3,8 +3,9 @@
 // no main because we don't want to use the normal entry point chain (Rust runtime, start from crt0...)
 #![no_main]
 
-// basically import of PanicInfo
+// import of PanicInfo
 use core::panic::PanicInfo;
+use crate::vga_buffer::print_something;
 
 // Module for printing
 mod vga_buffer;
@@ -22,14 +23,15 @@ fn panic(_info: &PanicInfo) -> ! {
 // no mangle to stop Rust from name mangling and outputs _start
 
 
-static HELLO: &[u8] = b"Hello World!";
+// static HELLO: &[u8] = b"Hello World!";
 #[no_mangle]
 // "C" to use C calling convention
 pub extern "C" fn _start() -> ! {
     // casting the int of our mem address into a raw pointer
-    let vga_buffer = 0xb8000 as *mut u8;
+    // let vga_buffer = 0xb8000 as *mut u8;
 
     // iterating over bytes of HELLO string
+    /*
     for (i, &byte) in HELLO.iter().enumerate() {
         unsafe {
             // writing string byte and color byte
@@ -37,6 +39,10 @@ pub extern "C" fn _start() -> ! {
             *vga_buffer.offset(i as isize * 2 + 1) = 0xb;
         }
     }
+    */
+
+    print_something();
+
     loop {}
 }
 
