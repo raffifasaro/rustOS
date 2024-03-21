@@ -6,7 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+# Using some older versions here because they make fewer problems with our project
 bootloader = "0.9"
+volatile = "0.2.6"
 
 # set panic to abort to prevent stack unwinding and our language item "eh_personality" error
 #[profile.dev]

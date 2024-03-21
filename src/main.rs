@@ -22,7 +22,6 @@ fn panic(_info: &PanicInfo) -> ! {
 // overwrite of entry point
 // no mangle to stop Rust from name mangling and outputs _start
 
-
 // static HELLO: &[u8] = b"Hello World!";
 #[no_mangle]
 // "C" to use C calling convention

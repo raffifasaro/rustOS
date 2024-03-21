@@ -1,3 +1,7 @@
+use volatile::Volatile;
+use core::fmt;
+use core::fmt::Write;
+
 // silence compiler for unused variants
 #[allow(dead_code)]
 // enable copy semantics
@@ -48,7 +52,8 @@ const BUFFER_WIDTH: usize = 80;
 
 #[repr(transparent)]
 struct Buffer {
-    chars: [[ScreenChar; BUFFER_WIDTH]; BUFFER_HEIGHT],
+    // we are using Volatile to hinder the Rust compiler from optimizing away our write
+    chars: [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT],
 }
 
 pub struct Writer {
@@ -60,9 +65,38 @@ pub struct Writer {
     buffer: &'static mut Buffer,
 }
 
+// we enable the Rust formatting macros for our Writer by implementing the fmt::Write trait
+impl Write for Writer {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        self.write_string(s);
+        Ok(())
+    }
+}
+
 impl Writer {
+
+    // implementation of clear_row fn that we need for fn new_line
+    fn clear_row(&mut self, row: usize) {
+        let blank = ScreenChar {
+            ascii_character: b' ',
+            color_code: self.color_code,
+        };
+        for col in 0..BUFFER_WIDTH {
+            self.buffer.chars[row][col].write(blank);
+        }
+    }
+
+    // implementation of new_line function for our Writer
     fn new_line(&mut self) {
-        // todo
+        // iterating and shifting
+        for row in 1..BUFFER_HEIGHT {
+            for col in 0..BUFFER_WIDTH {
+                let char = self.buffer.chars[row][col].read();
+                self.buffer.chars[row - 1][col].write(char);
+            }
+        }
+        self.clear_row(BUFFER_HEIGHT - 1);
+        self.column_position = 0;
     }
     pub fn write_byte(&mut self, byte: u8) {
         match byte {
@@ -79,10 +113,10 @@ impl Writer {
                 let color_code = self.color_code;
 
                 // write new ScreenChar to current position
-                self.buffer.chars[row][col] = ScreenChar {
+                self.buffer.chars[row][col].write(ScreenChar {
                     ascii_character: byte,
                     color_code,
-                };
+                });
                 // advance column position when done
                 self.column_position += 1;
 
