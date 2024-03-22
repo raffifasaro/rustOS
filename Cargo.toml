@@ -9,6 +9,12 @@ edition = "2021"
 # Using some older versions here because they make fewer problems with our project
 bootloader = "0.9"
 volatile = "0.2.6"
+spin = "0.5.2"
+log = "0.4.21"
+
+[dependencies.lazy_static]
+version = "1.0"
+features = ["spin_no_std"]
 
 # set panic to abort to prevent stack unwinding and our language item "eh_personality" error
 #[profile.dev]

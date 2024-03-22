@@ -3,9 +3,8 @@
 // no main because we don't want to use the normal entry point chain (Rust runtime, start from crt0...)
 #![no_main]
 
-// import of PanicInfo
+// "imports"
 use core::panic::PanicInfo;
-use crate::vga_buffer::print_something;
 
 // Module for printing
 mod vga_buffer;
@@ -15,7 +14,9 @@ mod vga_buffer;
 // _ is convention because info parameter is not used
 // -> ! specifies return type of function. ! is the "never type" indicating returning NOTHING, not even control to the caller
 // (different to "void" equivalent of omitting the return type
-fn panic(_info: &PanicInfo) -> ! {
+fn panic(info: &PanicInfo) -> ! {
+    // we use our println implementation to integrate the panic handler into our writer
+    println!("{}", info);
     loop {}
 }
 
@@ -40,7 +41,11 @@ pub extern "C" fn _start() -> ! {
     }
     */
 
-    print_something();
+    // use of our write_str implementation
+    //vga_buffer::WRITER.lock().write_str("Amogus").unwrap();
+
+    // use of our println implementation
+    println!("Amogus");
 
     loop {}
 }

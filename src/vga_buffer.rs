@@ -1,6 +1,8 @@
 use volatile::Volatile;
 use core::fmt;
 use core::fmt::Write;
+use lazy_static::lazy_static;
+use spin::Mutex;
 
 // silence compiler for unused variants
 #[allow(dead_code)]
@@ -136,22 +138,33 @@ impl Writer {
     }
 }
 
-
-// temp write function
-pub fn print_something() {
-    let mut writer = Writer {
+// using lazy static since Rusts const evaluator can't convert raw pointers to refs at compile time
+lazy_static! {
+    // creating a global writer
+    // using Spinlocks to get synchronized interior mutability
+    pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer {
         column_position: 0,
-        color_code: ColorCode::new(Color::Cyan, Color::DarkGray),
-        buffer: unsafe { &mut *(0xb8000 as *mut Buffer)}
-    };
-
-    writer.write_string("Test");
+        color_code: ColorCode::new(Color::Cyan, Color::LightGray),
+        buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
+    });
 }
 
+// modified versions of the println and print macros to use for our own _print fn
 
+#[doc(hidden)]
+pub fn _print(args: fmt::Arguments) {
+    WRITER.lock().write_fmt(args).unwrap();
+}
+#[macro_export]
+macro_rules! print {
+    ($($arg:tt)*) => ($crate::vga_buffer::_print(format_args!($($arg)*)));
+}
 
-
-
+#[macro_export]
+macro_rules! println {
+    () => ($crate::print!("\n"));
+    ($($arg:tt)*) => ($crate::print!("{}\n", format_args!($($arg)*)));
+}
 
 
 
