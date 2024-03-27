@@ -11,7 +11,7 @@
 
 // "imports"
 use core::panic::PanicInfo;
-use rustOS::test_panic_handler;
+use rustOS::{init, test_panic_handler};
 
 // Module for printing
 mod vga_buffer;
@@ -46,6 +46,11 @@ pub extern "C" fn _start() -> ! {
 
     // use of our println implementation
     println!("Amogus");
+    // call init function defined in lib
+    init();
+
+    // breakpoint exception test
+    //x86_64::instructions::interrupts::int3();
 
     #[cfg(test)]
     test_main();
