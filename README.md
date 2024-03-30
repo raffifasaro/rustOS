@@ -12,3 +12,6 @@ let the bootloader tool config in the cargo config.toml handle it with:
 runner = "bootimage runner"
 ```
 (qemu should be started with "cargo run"
+
+- including 
+CPU exception handling
